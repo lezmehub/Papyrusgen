@@ -1,0 +1,2833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Paper Generator</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bangla:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4cc9f0;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #42b883;
+            --warning-color: #f77f00;
+            --danger-color: #d62828;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f7fb;
+            color: var(--dark-color);
+        }
+        
+        .bangla-font {
+            font-family: 'Noto Sans Bangla', sans-serif;
+        }
+        
+        .navbar {
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.5rem;
+        }
+        
+        .container-fluid {
+            padding: 20px;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,.05);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 12px 12px 0 0 !important;
+            font-weight: 600;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.25rem rgba(76, 201, 240, 0.25);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        
+        .btn-info {
+            background-color: #17a2b8;
+            border-color: #17a2b8;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning-color);
+            border-color: var(--warning-color);
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        
+        .btn-danger {
+            border-radius: 8px;
+        }
+        
+        .question-item {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,.05);
+        }
+        
+        .section-header {
+            background-color: #e9ecef;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .preview-container {
+            background-color: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,.05);
+            min-height: 500px;
+            overflow: hidden;
+            font-family: 'Times New Roman', serif;
+            line-height: 1.6;
+            color: #000;
+        }
+        
+        .preview-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #000;
+        }
+        
+        .preview-logo {
+            max-width: 100px;
+            max-height: 100px;
+            margin-bottom: 15px;
+        }
+        
+        .preview-question {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        .preview-section {
+            margin-bottom: 25px;
+        }
+        
+        .preview-section-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #000;
+            text-decoration: underline;
+        }
+        
+        .footer {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px 0;
+            margin-top: 30px;
+        }
+        
+        .tabs-container {
+            margin-bottom: 20px;
+        }
+        
+        .nav-tabs {
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .nav-tabs .nav-link {
+            color: var(--dark-color);
+            border: none;
+            border-bottom: 2px solid transparent;
+            border-radius: 0;
+            padding: 10px 20px;
+            font-weight: 500;
+        }
+        
+        .nav-tabs .nav-link:hover {
+            border-bottom-color: var(--accent-color);
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: var(--primary-color);
+            background-color: transparent;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .tab-content {
+            padding: 20px 0;
+        }
+        
+        .template-card {
+            border: 2px solid transparent;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: white;
+        }
+        
+        .template-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,.1);
+        }
+        
+        .template-card.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+        
+        .template-preview {
+            height: 150px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: #6c757d;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid #dee2e6;
+        }
+        
+        .template-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .auto-save-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--success-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .pdf-customization-panel {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .watermark-preview {
+            height: 100px;
+            background-color: white;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .watermark-text {
+            position: absolute;
+            font-size: 2rem;
+            color: rgba(0,0,0,0.1);
+            transform: rotate(-45deg);
+            white-space: nowrap;
+        }
+        
+        .print-preview-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 10000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .print-preview-content {
+            background-color: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 900px;
+            height: 90%;
+            max-height: 800px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .print-preview-header {
+            padding: 15px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .print-preview-body {
+            flex: 1;
+            overflow: auto;
+            padding: 20px;
+        }
+        
+        .print-preview-footer {
+            padding: 15px 20px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .share-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 10000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .share-content {
+            background-color: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            padding: 20px;
+        }
+        
+        .comment-item {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .comment-author {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+        
+        .comment-text {
+            font-size: 0.9rem;
+            color: #495057;
+        }
+        
+        .comment-time {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        
+        .version-item {
+            padding: 10px;
+            border-bottom: 1px solid #dee2e6;
+            cursor: pointer;
+        }
+        
+        .version-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .version-item:last-child {
+            border-bottom: none;
+        }
+        
+        .version-time {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        
+        .loading-spinner {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+        
+        .pdf-preview-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 10000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .pdf-preview-content {
+            background-color: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 900px;
+            height: 90%;
+            max-height: 800px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .pdf-preview-header {
+            padding: 15px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .pdf-preview-body {
+            flex: 1;
+            overflow: auto;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .pdf-preview-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .pdf-preview-footer {
+            padding: 15px 20px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .pdf-preview-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .language-toggle {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .language-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .container-fluid {
+                padding: 10px;
+            }
+            
+            .card {
+                margin-bottom: 15px;
+            }
+        }
+        
+        .logo-preview {
+            max-width: 150px;
+            max-height: 150px;
+            margin-top: 10px;
+        }
+        
+        .marks-input {
+            max-width: 80px;
+        }
+        
+        .question-type-badge {
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-file-alt me-2"></i><span data-translate="appTitle">Question Paper Generator</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-home me-1"></i><span data-translate="home">Home</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-info-circle me-1"></i><span data-translate="about">About</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-envelope me-1"></i><span data-translate="contact">Contact</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <button class="language-toggle ms-2" id="languageToggle">
+                            <i class="fas fa-globe me-1"></i><span id="currentLang">EN</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Left Panel - Form -->
+            <div class="col-lg-5">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-edit me-2"></i><span data-translate="createQuestionPaper">Create Question Paper</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="tabs-container">
+                            <ul class="nav nav-tabs" id="formTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="header-tab" data-bs-toggle="tab" data-bs-target="#header" type="button"><span data-translate="header">Header</span></button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="questions-tab" data-bs-toggle="tab" data-bs-target="#questions" type="button"><span data-translate="questions">Questions</span></button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="template-tab" data-bs-toggle="tab" data-bs-target="#template" type="button"><span data-translate="template">Template</span></button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button"><span data-translate="settings">Settings</span></button>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="formTabsContent">
+                                <!-- Header Tab -->
+                                <div class="tab-pane fade show active" id="header" role="tabpanel">
+                                    <form id="headerForm">
+                                        <div class="mb-3">
+                                            <label for="institutionName" class="form-label"><span data-translate="institutionName">Institution Name</span></label>
+                                            <input type="text" class="form-control" id="institutionName" placeholder="Enter institution name">
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="institutionAddress" class="form-label"><span data-translate="institutionAddress">Institution Address</span></label>
+                                            <textarea class="form-control" id="institutionAddress" rows="2" placeholder="Enter institution address"></textarea>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="examName" class="form-label"><span data-translate="examName">Exam Name</span></label>
+                                            <input type="text" class="form-control" id="examName" placeholder="e.g., Annual Exam, Recruitment Exam">
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="subjectName" class="form-label"><span data-translate="subjectName">Subject Name</span></label>
+                                                <input type="text" class="form-control" id="subjectName" placeholder="Enter subject name">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="subjectCode" class="form-label"><span data-translate="subjectCode">Subject Code</span></label>
+                                                <input type="text" class="form-control" id="subjectCode" placeholder="Enter subject code">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="examDuration" class="form-label"><span data-translate="examDuration">Exam Duration</span></label>
+                                                <input type="text" class="form-control" id="examDuration" placeholder="e.g., 3 hours">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="totalMarks" class="form-label"><span data-translate="totalMarks">Total Marks</span></label>
+                                                <input type="number" class="form-control" id="totalMarks" placeholder="Enter total marks">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="institutionLogo" class="form-label"><span data-translate="institutionLogo">Institution Logo</span></label>
+                                            <input type="file" class="form-control" id="institutionLogo" accept="image/*">
+                                            <div id="logoPreview" class="mt-2"></div>
+                                        </div>
+                                        
+                                        <button type="button" class="btn btn-primary w-100" id="updateHeaderBtn">
+                                            <i class="fas fa-sync-alt me-2"></i><span data-translate="updateHeader">Update Header</span>
+                                        </button>
+                                    </form>
+                                </div>
+                                
+                                <!-- Questions Tab -->
+                                <div class="tab-pane fade" id="questions" role="tabpanel">
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h5 class="mb-0"><span data-translate="questions">Questions</span></h5>
+                                            <button type="button" class="btn btn-success btn-sm" id="addSectionBtn">
+                                                <i class="fas fa-plus me-1"></i><span data-translate="addSection">Add Section</span>
+                                            </button>
+                                        </div>
+                                        
+                                        <div id="sectionsContainer">
+                                            <!-- Default section -->
+                                            <div class="section-item" data-section-id="section-1">
+                                                <div class="section-header d-flex justify-content-between align-items-center">
+                                                    <span><span data-translate="section">Section</span> A</span>
+                                                    <div>
+                                                        <button type="button" class="btn btn-sm btn-outline-primary edit-section-btn">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-outline-danger delete-section-btn" style="display: none;">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="section-questions" id="section-1-questions">
+                                                    <!-- Questions will be added here -->
+                                                </div>
+                                                
+                                                <div class="text-center mt-2">
+                                                    <button type="button" class="btn btn-sm btn-outline-primary add-question-btn" data-section-id="section-1">
+                                                        <i class="fas fa-plus me-1"></i><span data-translate="addQuestion">Add Question</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex gap-2">
+                                        <button type="button" class="btn btn-info flex-fill" id="previewPdfBtn">
+                                            <i class="fas fa-eye me-2"></i><span data-translate="previewPdf">Preview PDF</span>
+                                        </button>
+                                        <button type="button" class="btn btn-primary flex-fill" id="generatePdfBtn">
+                                            <i class="fas fa-download me-2"></i><span data-translate="downloadPdf">Download PDF</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Template Tab -->
+                                <div class="tab-pane fade" id="template" role="tabpanel">
+                                    <h5 class="mb-3"><span data-translate="selectTemplate">Select Template</span></h5>
+                                    
+                                    <div class="template-card" data-template="board">
+                                        <div class="template-preview">
+                                            <img src="https://via.placeholder.com/300x150/4361ee/ffffff?text=Board+Exam+Style" alt="Board Exam Style">
+                                        </div>
+                                        <h6><span data-translate="boardExam">Board Exam</span></h6>
+                                        <p class="small text-muted"><span data-translate="boardExamDesc">Formal board examination template with standard layout</span></p>
+                                    </div>
+                                    
+                                    <div class="template-card" data-template="coaching">
+                                        <div class="template-preview">
+                                            <img src="https://via.placeholder.com/300x150/42b883/ffffff?text=Coaching+Center+Style" alt="Coaching Center Style">
+                                        </div>
+                                        <h6><span data-translate="coachingCenter">Coaching Center</span></h6>
+                                        <p class="small text-muted"><span data-translate="coachingDesc">Modern coaching center template with branding</span></p>
+                                    </div>
+                                    
+                                    <div class="template-card" data-template="school">
+                                        <div class="template-preview">
+                                            <img src="https://via.placeholder.com/300x150/f77f00/ffffff?text=School+Style" alt="School Style">
+                                        </div>
+                                        <h6><span data-translate="school">School</span></h6>
+                                        <p class="small text-muted"><span data-translate="schoolDesc">Simple school exam template</span></p>
+                                    </div>
+                                    
+                                    <div class="template-card" data-template="college">
+                                        <div class="template-preview">
+                                            <img src="https://via.placeholder.com/300x150/17a2b8/ffffff?text=College+Style" alt="College Style">
+                                        </div>
+                                        <h6><span data-translate="college">College</span></h6>
+                                        <p class="small text-muted"><span data-translate="collegeDesc">Professional college exam template</span></p>
+                                    </div>
+                                    
+                                    <div class="template-card" data-template="minimal">
+                                        <div class="template-preview">
+                                            <img src="https://via.placeholder.com/300x150/6c757d/ffffff?text=Minimal+Style" alt="Minimal Style">
+                                        </div>
+                                        <h6><span data-translate="minimal">Minimal</span></h6>
+                                        <p class="small text-muted"><span data-translate="minimalDesc">Clean and minimal design</span></p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Settings Tab -->
+                                <div class="tab-pane fade" id="settings" role="tabpanel">
+                                    <div class="mb-4">
+                                        <h5 class="mb-3"><span data-translate="exportImport">Export/Import</span></h5>
+                                        <div class="d-flex gap-2">
+                                            <button type="button" class="btn btn-success" id="exportBtn">
+                                                <i class="fas fa-file-export me-2"></i><span data-translate="export">Export</span>
+                                            </button>
+                                            <button type="button" class="btn btn-info" id="importBtn">
+                                                <i class="fas fa-file-import me-2"></i><span data-translate="import">Import</span>
+                                            </button>
+                                            <input type="file" id="importFile" accept=".json" style="display: none;">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <h5 class="mb-3"><span data-translate="pdfCustomization">PDF Customization</span></h5>
+                                        <div class="pdf-customization-panel">
+                                            <div class="mb-3">
+                                                <label for="watermarkText" class="form-label"><span data-translate="watermark">Watermark Text</span></label>
+                                                <input type="text" class="form-control" id="watermarkText" placeholder="Enter watermark text">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="pageNumbering" class="form-label"><span data-translate="pageNumbering">Page Numbering</span></label>
+                                                <select class="form-select" id="pageNumbering">
+                                                    <option value="none" data-translate="none">None</option>
+                                                    <option value="bottom-right" data-translate="bottomRight">Bottom Right</option>
+                                                    <option value="bottom-center" data-translate="bottomCenter">Bottom Center</option>
+                                                    <option value="top-right" data-translate="topRight">Top Right</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="fontSize" class="form-label"><span data-translate="fontSize">Font Size</span></label>
+                                                <select class="form-select" id="fontSize">
+                                                    <option value="10">10px</option>
+                                                    <option value="12" selected>12px</option>
+                                                    <option value="14">14px</option>
+                                                    <option value="16">16px</option>
+                                                </select>
+                                            </div>
+                                            <div class="watermark-preview">
+                                                <span class="watermark-text" id="watermarkPreview">SAMPLE</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <h5 class="mb-3"><span data-translate="collaboration">Collaboration</span></h5>
+                                        <div class="d-flex gap-2">
+                                            <button type="button" class="btn btn-warning" id="shareBtn">
+                                                <i class="fas fa-share-alt me-2"></i><span data-translate="share">Share</span>
+                                            </button>
+                                            <button type="button" class="btn btn-primary" id="printPreviewBtn">
+                                                <i class="fas fa-print me-2"></i><span data-translate="printPreview">Print Preview</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Panel - Preview -->
+            <div class="col-lg-7">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-eye me-2"></i><span data-translate="preview">Preview</span></span>
+                        <button type="button" class="btn btn-light btn-sm" id="refreshPreviewBtn">
+                            <i class="fas fa-sync-alt me-1"></i><span data-translate="refresh">Refresh</span>
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="preview-container" id="previewContainer">
+                            <div class="preview-header">
+                                <div id="previewLogoContainer"></div>
+                                <h4 id="previewInstitutionName">Institution Name</h4>
+                                <p id="previewInstitutionAddress">Institution Address</p>
+                                <h5 id="previewExamName">Exam Name</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <strong><span data-translate="subject">Subject</span>:</strong> <span id="previewSubjectName">Subject Name</span> (<span id="previewSubjectCode">Subject Code</span>)
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong><span data-translate="duration">Duration</span>:</strong> <span id="previewExamDuration">Exam Duration</span> | <strong><span data-translate="totalMarks">Total Marks</span>:</strong> <span id="previewTotalMarks">Total Marks</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="previewQuestionsContainer">
+                                <p class="text-center text-muted"><span data-translate="addQuestions">Add questions to see the preview</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="footer mt-5">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><span data-translate="appTitle">Question Paper Generator</span></h5>
+                    <p><span data-translate="footerDesc">Create professional question papers with ease</span></p>
+                </div>
+                <div class="col-md-3">
+                    <h5><span data-translate="quickLinks">Quick Links</span></h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white"><span data-translate="home">Home</span></a></li>
+                        <li><a href="#" class="text-white"><span data-translate="about">About</span></a></li>
+                        <li><a href="#" class="text-white"><span data-translate="contact">Contact</span></a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5><span data-translate="contactUs">Contact Us</span></h5>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-envelope me-2"></i>info@example.com</li>
+                        <li><i class="fas fa-phone me-2"></i>+123 456 7890</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="bg-white">
+            <div class="text-center">
+                <p class="mb-0">&copy; 2023 <span data-translate="appTitle">Question Paper Generator</span>. <span data-translate="allRights">All rights reserved</span>.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Auto Save Indicator -->
+    <div class="auto-save-indicator" id="autoSaveIndicator">
+        <i class="fas fa-check-circle me-2"></i><span data-translate="autoSaved">Auto Saved</span>
+    </div>
+    
+    <!-- Loading Spinner -->
+    <div class="loading-spinner" id="loadingSpinner">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    
+    <!-- PDF Preview Modal -->
+    <div class="pdf-preview-container" id="pdfPreviewContainer">
+        <div class="pdf-preview-content">
+            <div class="pdf-preview-header">
+                <h5 class="mb-0"><span data-translate="pdfPreview">PDF Preview</span></h5>
+                <button type="button" class="btn-close btn-close-white" id="closePdfPreviewBtn"></button>
+            </div>
+            <div class="pdf-preview-body">
+                <object id="pdfPreviewFrame" class="pdf-preview-frame" type="application/pdf"></object>
+            </div>
+            <div class="pdf-preview-footer">
+                <div class="pdf-preview-actions">
+                    <button type="button" class="btn btn-primary" id="downloadPdfFromPreviewBtn">
+                        <i class="fas fa-download me-2"></i><span data-translate="downloadPdf">Download PDF</span>
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="printPdfBtn">
+                        <i class="fas fa-print me-2"></i><span data-translate="print">Print</span>
+                    </button>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-light" id="closePdfPreviewFooterBtn"><span data-translate="close">Close</span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Print Preview Modal -->
+    <div class="print-preview-container" id="printPreviewContainer">
+        <div class="print-preview-content">
+            <div class="print-preview-header">
+                <h5 class="mb-0"><span data-translate="printPreview">Print Preview</span></h5>
+                <button type="button" class="btn-close btn-close-white" id="closePrintPreviewBtn"></button>
+            </div>
+            <div class="print-preview-body" id="printPreviewBody">
+                <!-- Print preview content will be inserted here -->
+            </div>
+            <div class="print-preview-footer">
+                <div class="print-preview-actions">
+                    <button type="button" class="btn btn-primary" id="printDocumentBtn">
+                        <i class="fas fa-print me-2"></i><span data-translate="print">Print</span>
+                    </button>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-light" id="closePrintPreviewFooterBtn"><span data-translate="close">Close</span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Share Modal -->
+    <div class="share-modal" id="shareModal">
+        <div class="share-content">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0"><span data-translate="shareQuestionPaper">Share Question Paper</span></h5>
+                <button type="button" class="btn-close" id="closeShareModalBtn"></button>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label"><span data-translate="shareLink">Share Link</span></label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="shareLink" readonly>
+                    <button class="btn btn-outline-primary" type="button" id="copyShareLinkBtn">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <h6><span data-translate="comments">Comments</span></h6>
+                <div class="mb-2">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="commentInput" placeholder="Add a comment">
+                        <button class="btn btn-primary" type="button" id="addCommentBtn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="commentsContainer">
+                    <!-- Comments will be added here -->
+                </div>
+            </div>
+            
+            <div>
+                <h6><span data-translate="versionHistory">Version History</span></h6>
+                <div id="versionHistoryContainer">
+                    <!-- Version history will be added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Global variables
+            let sectionCount = 1;
+            let questionCount = 0;
+            let logoDataUrl = null;
+            let currentPdfBlob = null;
+            let currentPdfUrl = null;
+            let selectedTemplate = 'board';
+            let currentLanguage = 'en';
+            let autoSaveInterval = null;
+            let shareId = null;
+            let comments = [];
+            let versionHistory = [];
+            
+            // Translation data
+            const translations = {
+                en: {
+                    appTitle: "Question Paper Generator",
+                    home: "Home",
+                    about: "About",
+                    contact: "Contact",
+                    createQuestionPaper: "Create Question Paper",
+                    header: "Header",
+                    questions: "Questions",
+                    template: "Template",
+                    settings: "Settings",
+                    institutionName: "Institution Name",
+                    institutionAddress: "Institution Address",
+                    examName: "Exam Name",
+                    subjectName: "Subject Name",
+                    subjectCode: "Subject Code",
+                    examDuration: "Exam Duration",
+                    totalMarks: "Total Marks",
+                    institutionLogo: "Institution Logo",
+                    updateHeader: "Update Header",
+                    addSection: "Add Section",
+                    addQuestion: "Add Question",
+                    section: "Section",
+                    previewPdf: "Preview PDF",
+                    downloadPdf: "Download PDF",
+                    selectTemplate: "Select Template",
+                    boardExam: "Board Exam",
+                    boardExamDesc: "Formal board examination template with standard layout",
+                    coachingCenter: "Coaching Center",
+                    coachingDesc: "Modern coaching center template with branding",
+                    school: "School",
+                    schoolDesc: "Simple school exam template",
+                    college: "College",
+                    collegeDesc: "Professional college exam template",
+                    minimal: "Minimal",
+                    minimalDesc: "Clean and minimal design",
+                    exportImport: "Export/Import",
+                    export: "Export",
+                    import: "Import",
+                    pdfCustomization: "PDF Customization",
+                    watermark: "Watermark Text",
+                    pageNumbering: "Page Numbering",
+                    none: "None",
+                    bottomRight: "Bottom Right",
+                    bottomCenter: "Bottom Center",
+                    topRight: "Top Right",
+                    fontSize: "Font Size",
+                    collaboration: "Collaboration",
+                    share: "Share",
+                    printPreview: "Print Preview",
+                    preview: "Preview",
+                    refresh: "Refresh",
+                    subject: "Subject",
+                    duration: "Duration",
+                    addQuestions: "Add questions to see the preview",
+                    footerDesc: "Create professional question papers with ease",
+                    quickLinks: "Quick Links",
+                    contactUs: "Contact Us",
+                    allRights: "All rights reserved",
+                    autoSaved: "Auto Saved",
+                    pdfPreview: "PDF Preview",
+                    print: "Print",
+                    close: "Close",
+                    shareQuestionPaper: "Share Question Paper",
+                    shareLink: "Share Link",
+                    comments: "Comments",
+                    versionHistory: "Version History"
+                },
+                bn: {
+                    appTitle: "প্রশ্নপত্র জেনারেটর",
+                    home: "হোম",
+                    about: "আমাদের সম্পর্কে",
+                    contact: "যোগাযোগ",
+                    createQuestionPaper: "প্রশ্নপত্র তৈরি করুন",
+                    header: "হেডার",
+                    questions: "প্রশ্ন",
+                    template: "টেমপ্লেট",
+                    settings: "সেটিংস",
+                    institutionName: "প্রতিষ্ঠানের নাম",
+                    institutionAddress: "প্রতিষ্ঠানের ঠিকানা",
+                    examName: "পরীক্ষার নাম",
+                    subjectName: "বিষয়ের নাম",
+                    subjectCode: "বিষয় কোড",
+                    examDuration: "পরীক্ষার সময়কাল",
+                    totalMarks: "মোট নম্বর",
+                    institutionLogo: "প্রতিষ্ঠানের লোগো",
+                    updateHeader: "হেডার আপডেট করুন",
+                    addSection: "সেকশন যোগ করুন",
+                    addQuestion: "প্রশ্ন যোগ করুন",
+                    section: "সেকশন",
+                    previewPdf: "পিডিএফ প্রিভিউ",
+                    downloadPdf: "পিডিএফ ডাউনলোড",
+                    selectTemplate: "টেমপ্লেট নির্বাচন করুন",
+                    boardExam: "বোর্ড পরীক্ষা",
+                    boardExamDesc: "আনুষ্ঠানিক বোর্ড পরীক্ষা টেমপ্লেট",
+                    coachingCenter: "কোচিং সেন্টার",
+                    coachingDesc: "আধুনিক কোচিং সেন্টার টেমপ্লেট",
+                    school: "স্কুল",
+                    schoolDesc: "সাধারণ স্কুল পরীক্ষা টেমপ্লেট",
+                    college: "কলেজ",
+                    collegeDesc: "পেশাদার কলেজ পরীক্ষা টেমপ্লেট",
+                    minimal: "মিনিমাল",
+                    minimalDesc: "পরিষ্কার এবং সরল ডিজাইন",
+                    exportImport: "এক্সপোর্ট/ইমপোর্ট",
+                    export: "এক্সপোর্ট",
+                    import: "ইমপোর্ট",
+                    pdfCustomization: "পিডিএফ কাস্টমাইজেশন",
+                    watermark: "ওয়াটারমার্ক টেক্সট",
+                    pageNumbering: "পেজ নাম্বারিং",
+                    none: "কোনোটিই না",
+                    bottomRight: "নিচে ডানদিকে",
+                    bottomCenter: "নিচে মাঝখানে",
+                    topRight: "উপরে ডানদিকে",
+                    fontSize: "ফন্ট সাইজ",
+                    collaboration: "সহযোগিতা",
+                    share: "শেয়ার",
+                    printPreview: "প্রিন্ট প্রিভিউ",
+                    preview: "প্রিভিউ",
+                    refresh: "রিফ্রেশ",
+                    subject: "বিষয়",
+                    duration: "সময়কাল",
+                    addQuestions: "প্রিভিউ দেখতে প্রশ্ন যোগ করুন",
+                    footerDesc: "সহজেই পেশাদার প্রশ্নপত্র তৈরি করুন",
+                    quickLinks: "দ্রুত লিংক",
+                    contactUs: "যোগাযোগ করুন",
+                    allRights: "সর্বস্বত্ব সংরক্ষিত",
+                    autoSaved: "অটো সেভ হয়েছে",
+                    pdfPreview: "পিডিএফ প্রিভিউ",
+                    print: "প্রিন্ট",
+                    close: "বন্ধ করুন",
+                    shareQuestionPaper: "প্রশ্নপত্র শেয়ার করুন",
+                    shareLink: "শেয়ার লিংক",
+                    comments: "মন্তব্য",
+                    versionHistory: "ভার্সন হিস্ট্রি"
+                }
+            };
+            
+            // Header form elements
+            const institutionNameInput = document.getElementById('institutionName');
+            const institutionAddressInput = document.getElementById('institutionAddress');
+            const examNameInput = document.getElementById('examName');
+            const subjectNameInput = document.getElementById('subjectName');
+            const subjectCodeInput = document.getElementById('subjectCode');
+            const examDurationInput = document.getElementById('examDuration');
+            const totalMarksInput = document.getElementById('totalMarks');
+            const institutionLogoInput = document.getElementById('institutionLogo');
+            const logoPreview = document.getElementById('logoPreview');
+            
+            // Preview elements
+            const previewInstitutionName = document.getElementById('previewInstitutionName');
+            const previewInstitutionAddress = document.getElementById('previewInstitutionAddress');
+            const previewExamName = document.getElementById('previewExamName');
+            const previewSubjectName = document.getElementById('previewSubjectName');
+            const previewSubjectCode = document.getElementById('previewSubjectCode');
+            const previewExamDuration = document.getElementById('previewExamDuration');
+            const previewTotalMarks = document.getElementById('previewTotalMarks');
+            const previewLogoContainer = document.getElementById('previewLogoContainer');
+            const previewQuestionsContainer = document.getElementById('previewQuestionsContainer');
+            const previewContainer = document.getElementById('previewContainer');
+            
+            // Buttons
+            const updateHeaderBtn = document.getElementById('updateHeaderBtn');
+            const addSectionBtn = document.getElementById('addSectionBtn');
+            const generatePdfBtn = document.getElementById('generatePdfBtn');
+            const previewPdfBtn = document.getElementById('previewPdfBtn');
+            const refreshPreviewBtn = document.getElementById('refreshPreviewBtn');
+            const sectionsContainer = document.getElementById('sectionsContainer');
+            const languageToggle = document.getElementById('languageToggle');
+            const currentLangSpan = document.getElementById('currentLang');
+            const exportBtn = document.getElementById('exportBtn');
+            const importBtn = document.getElementById('importBtn');
+            const importFile = document.getElementById('importFile');
+            const watermarkText = document.getElementById('watermarkText');
+            const watermarkPreview = document.getElementById('watermarkPreview');
+            const pageNumbering = document.getElementById('pageNumbering');
+            const fontSize = document.getElementById('fontSize');
+            const shareBtn = document.getElementById('shareBtn');
+            const printPreviewBtn = document.getElementById('printPreviewBtn');
+            
+            // PDF Preview elements
+            const pdfPreviewContainer = document.getElementById('pdfPreviewContainer');
+            const pdfPreviewFrame = document.getElementById('pdfPreviewFrame');
+            const closePdfPreviewBtn = document.getElementById('closePdfPreviewBtn');
+            const closePdfPreviewFooterBtn = document.getElementById('closePdfPreviewFooterBtn');
+            const downloadPdfFromPreviewBtn = document.getElementById('downloadPdfFromPreviewBtn');
+            const printPdfBtn = document.getElementById('printPdfBtn');
+            
+            // Print Preview elements
+            const printPreviewContainer = document.getElementById('printPreviewContainer');
+            const printPreviewBody = document.getElementById('printPreviewBody');
+            const closePrintPreviewBtn = document.getElementById('closePrintPreviewBtn');
+            const closePrintPreviewFooterBtn = document.getElementById('closePrintPreviewFooterBtn');
+            const printDocumentBtn = document.getElementById('printDocumentBtn');
+            
+            // Share Modal elements
+            const shareModal = document.getElementById('shareModal');
+            const closeShareModalBtn = document.getElementById('closeShareModalBtn');
+            const shareLink = document.getElementById('shareLink');
+            const copyShareLinkBtn = document.getElementById('copyShareLinkBtn');
+            const commentInput = document.getElementById('commentInput');
+            const addCommentBtn = document.getElementById('addCommentBtn');
+            const commentsContainer = document.getElementById('commentsContainer');
+            const versionHistoryContainer = document.getElementById('versionHistoryContainer');
+            
+            // Auto save indicator
+            const autoSaveIndicator = document.getElementById('autoSaveIndicator');
+            
+            // Initialize language
+            function setLanguage(lang) {
+                currentLanguage = lang;
+                currentLangSpan.textContent = lang.toUpperCase();
+                
+                // Update all translatable elements
+                document.querySelectorAll('[data-translate]').forEach(element => {
+                    const key = element.getAttribute('data-translate');
+                    if (translations[lang] && translations[lang][key]) {
+                        element.textContent = translations[lang][key];
+                    }
+                });
+                
+                // Update placeholders
+                document.querySelectorAll('input[placeholder], textarea[placeholder]').forEach(element => {
+                    const placeholder = element.getAttribute('placeholder');
+                    // You can add placeholder translations if needed
+                });
+                
+                // Update font for Bangla
+                if (lang === 'bn') {
+                    document.body.classList.add('bangla-font');
+                } else {
+                    document.body.classList.remove('bangla-font');
+                }
+                
+                // Save language preference
+                localStorage.setItem('preferredLanguage', lang);
+            }
+            
+            // Language toggle
+            languageToggle.addEventListener('click', function() {
+                const newLang = currentLanguage === 'en' ? 'bn' : 'en';
+                setLanguage(newLang);
+            });
+            
+            // Load saved language
+            const savedLanguage = localStorage.getItem('preferredLanguage');
+            if (savedLanguage) {
+                setLanguage(savedLanguage);
+            }
+            
+            // Auto save functionality
+            function startAutoSave() {
+                if (autoSaveInterval) {
+                    clearInterval(autoSaveInterval);
+                }
+                
+                autoSaveInterval = setInterval(() => {
+                    saveToLocalStorage();
+                    showAutoSaveIndicator();
+                }, 30000); // Auto save every 30 seconds
+            }
+            
+            function saveToLocalStorage() {
+                const data = {
+                    header: {
+                        institutionName: institutionNameInput.value,
+                        institutionAddress: institutionAddressInput.value,
+                        examName: examNameInput.value,
+                        subjectName: subjectNameInput.value,
+                        subjectCode: subjectCodeInput.value,
+                        examDuration: examDurationInput.value,
+                        totalMarks: totalMarksInput.value,
+                        logoDataUrl: logoDataUrl
+                    },
+                    sections: [],
+                    template: selectedTemplate,
+                    settings: {
+                        watermarkText: watermarkText.value,
+                        pageNumbering: pageNumbering.value,
+                        fontSize: fontSize.value
+                    },
+                    language: currentLanguage
+                };
+                
+                // Save sections and questions
+                document.querySelectorAll('.section-item').forEach(section => {
+                    const sectionData = {
+                        id: section.getAttribute('data-section-id'),
+                        name: section.querySelector('.section-header span').textContent,
+                        questions: []
+                    };
+                    
+                    section.querySelectorAll('.question-item').forEach(question => {
+                        const questionData = {
+                            id: question.getAttribute('data-question-id'),
+                            type: question.querySelector('.question-type-select').value,
+                            text: question.querySelector('.question-text').value,
+                            marks: question.querySelector('.marks-input').value
+                        };
+                        
+                        if (questionData.type === 'mcq') {
+                            questionData.options = [];
+                            question.querySelectorAll('.mcq-option').forEach(option => {
+                                questionData.options.push(option.value);
+                            });
+                        }
+                        
+                        sectionData.questions.push(questionData);
+                    });
+                    
+                    data.sections.push(sectionData);
+                });
+                
+                localStorage.setItem('questionPaperData', JSON.stringify(data));
+            }
+            
+            function loadFromLocalStorage() {
+                const savedData = localStorage.getItem('questionPaperData');
+                if (savedData) {
+                    try {
+                        const data = JSON.parse(savedData);
+                        
+                        // Load header data
+                        institutionNameInput.value = data.header.institutionName || '';
+                        institutionAddressInput.value = data.header.institutionAddress || '';
+                        examNameInput.value = data.header.examName || '';
+                        subjectNameInput.value = data.header.subjectName || '';
+                        subjectCodeInput.value = data.header.subjectCode || '';
+                        examDurationInput.value = data.header.examDuration || '';
+                        totalMarksInput.value = data.header.totalMarks || '';
+                        logoDataUrl = data.header.logoDataUrl || null;
+                        
+                        if (logoDataUrl) {
+                            logoPreview.innerHTML = `<img src="${logoDataUrl}" alt="Logo Preview" class="logo-preview">`;
+                        }
+                        
+                        // Load settings
+                        selectedTemplate = data.template || 'board';
+                        watermarkText.value = data.settings.watermarkText || '';
+                        pageNumbering.value = data.settings.pageNumbering || 'none';
+                        fontSize.value = data.settings.fontSize || '12';
+                        
+                        // Update watermark preview
+                        watermarkPreview.textContent = watermarkText.value || 'SAMPLE';
+                        
+                        // Select template
+                        document.querySelectorAll('.template-card').forEach(card => {
+                            card.classList.remove('selected');
+                            if (card.getAttribute('data-template') === selectedTemplate) {
+                                card.classList.add('selected');
+                            }
+                        });
+                        
+                        // Load language
+                        if (data.language && data.language !== currentLanguage) {
+                            setLanguage(data.language);
+                        }
+                        
+                        // Clear existing sections
+                        sectionsContainer.innerHTML = '';
+                        sectionCount = 0;
+                        questionCount = 0;
+                        
+                        // Load sections and questions
+                        data.sections.forEach(sectionData => {
+                            sectionCount++;
+                            const sectionId = sectionData.id || `section-${sectionCount}`;
+                            const sectionLetter = String.fromCharCode(65 + sectionCount - 1);
+                            
+                            const sectionHtml = `
+                                <div class="section-item" data-section-id="${sectionId}">
+                                    <div class="section-header d-flex justify-content-between align-items-center">
+                                        <span>${sectionData.name || `Section ${sectionLetter}`}</span>
+                                        <div>
+                                            <button type="button" class="btn btn-sm btn-outline-primary edit-section-btn">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger delete-section-btn" ${sectionCount === 1 ? 'style="display: none;"' : ''}>
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="section-questions" id="${sectionId}-questions">
+                                        <!-- Questions will be added here -->
+                                    </div>
+                                    
+                                    <div class="text-center mt-2">
+                                        <button type="button" class="btn btn-sm btn-outline-primary add-question-btn" data-section-id="${sectionId}">
+                                            <i class="fas fa-plus me-1"></i><span data-translate="addQuestion">Add Question</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                            
+                            sectionsContainer.insertAdjacentHTML('beforeend', sectionHtml);
+                            
+                            // Add questions to section
+                            const questionsContainer = document.getElementById(`${sectionId}-questions`);
+                            sectionData.questions.forEach(questionData => {
+                                questionCount++;
+                                const questionId = questionData.id || `question-${questionCount}`;
+                                
+                                const questionHtml = `
+                                    <div class="question-item" data-question-id="${questionId}">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <div class="d-flex align-items-center">
+                                                <span class="me-2 fw-bold">Q${questionCount}.</span>
+                                                <select class="form-select form-select-sm question-type-select" style="width: auto;">
+                                                    <option value="written" ${questionData.type === 'written' ? 'selected' : ''}>Written</option>
+                                                    <option value="short" ${questionData.type === 'short' ? 'selected' : ''}>Short Answer</option>
+                                                    <option value="mcq" ${questionData.type === 'mcq' ? 'selected' : ''}>MCQ</option>
+                                                </select>
+                                            </div>
+                                            <div class="d-flex align-items-center">
+                                                <span class="me-2">Marks:</span>
+                                                <input type="number" class="form-control form-control-sm marks-input" min="1" value="${questionData.marks || 1}">
+                                                <button type="button" class="btn btn-sm btn-outline-danger ms-2 delete-question-btn">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <textarea class="form-control question-text" rows="2" placeholder="Enter question text">${questionData.text || ''}</textarea>
+                                        <div class="mcq-options mt-2" style="display: ${questionData.type === 'mcq' ? 'block' : 'none'};">
+                                            <div class="input-group mb-1">
+                                                <span class="input-group-text">A.</span>
+                                                <input type="text" class="form-control mcq-option" placeholder="Option A" value="${questionData.options && questionData.options[0] || ''}">
+                                            </div>
+                                            <div class="input-group mb-1">
+                                                <span class="input-group-text">B.</span>
+                                                <input type="text" class="form-control mcq-option" placeholder="Option B" value="${questionData.options && questionData.options[1] || ''}">
+                                            </div>
+                                            <div class="input-group mb-1">
+                                                <span class="input-group-text">C.</span>
+                                                <input type="text" class="form-control mcq-option" placeholder="Option C" value="${questionData.options && questionData.options[2] || ''}">
+                                            </div>
+                                            <div class="input-group">
+                                                <span class="input-group-text">D.</span>
+                                                <input type="text" class="form-control mcq-option" placeholder="Option D" value="${questionData.options && questionData.options[3] || ''}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                                
+                                questionsContainer.insertAdjacentHTML('beforeend', questionHtml);
+                                
+                                // Add event listeners to the new question elements
+                                const newQuestion = document.querySelector(`[data-question-id="${questionId}"]`);
+                                
+                                // Question type change
+                                newQuestion.querySelector('.question-type-select').addEventListener('change', function() {
+                                    const mcqOptions = newQuestion.querySelector('.mcq-options');
+                                    if (this.value === 'mcq') {
+                                        mcqOptions.style.display = 'block';
+                                    } else {
+                                        mcqOptions.style.display = 'none';
+                                    }
+                                    updateQuestionsPreview();
+                                });
+                                
+                                // Delete question button
+                                newQuestion.querySelector('.delete-question-btn').addEventListener('click', function() {
+                                    if (confirm('Are you sure you want to delete this question?')) {
+                                        newQuestion.remove();
+                                        updateQuestionsPreview();
+                                        showNotification('Question deleted!', 'danger');
+                                    }
+                                });
+                                
+                                // Update preview on input
+                                newQuestion.querySelector('.question-text').addEventListener('input', updateQuestionsPreview);
+                                newQuestion.querySelector('.marks-input').addEventListener('input', updateQuestionsPreview);
+                                
+                                // MCQ options input
+                                newQuestion.querySelectorAll('.mcq-option').forEach(option => {
+                                    option.addEventListener('input', updateQuestionsPreview);
+                                });
+                            });
+                        });
+                        
+                        // Add event listeners to section buttons
+                        attachSectionEventListeners();
+                        
+                        // Update preview
+                        updateHeaderPreview();
+                        updateQuestionsPreview();
+                        
+                        showNotification('Data loaded successfully!', 'success');
+                    } catch (error) {
+                        console.error('Error loading data:', error);
+                        showNotification('Error loading saved data', 'danger');
+                    }
+                }
+            }
+            
+            function showAutoSaveIndicator() {
+                autoSaveIndicator.style.display = 'block';
+                setTimeout(() => {
+                    autoSaveIndicator.style.display = 'none';
+                }, 2000);
+            }
+            
+            // Start auto save
+            startAutoSave();
+            
+            // Load saved data on page load
+            loadFromLocalStorage();
+            
+            // Template selection
+            document.querySelectorAll('.template-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedTemplate = this.getAttribute('data-template');
+                    
+                    saveToLocalStorage();
+                    showNotification('Template selected!', 'success');
+                });
+            });
+            
+            // Watermark preview
+            watermarkText.addEventListener('input', function() {
+                watermarkPreview.textContent = this.value || 'SAMPLE';
+                saveToLocalStorage();
+            });
+            
+            // Page numbering and font size change
+            pageNumbering.addEventListener('change', saveToLocalStorage);
+            fontSize.addEventListener('change', saveToLocalStorage);
+            
+            // Export functionality
+            exportBtn.addEventListener('click', function() {
+                const data = {
+                    header: {
+                        institutionName: institutionNameInput.value,
+                        institutionAddress: institutionAddressInput.value,
+                        examName: examNameInput.value,
+                        subjectName: subjectNameInput.value,
+                        subjectCode: subjectCodeInput.value,
+                        examDuration: examDurationInput.value,
+                        totalMarks: totalMarksInput.value
+                    },
+                    sections: [],
+                    template: selectedTemplate,
+                    settings: {
+                        watermarkText: watermarkText.value,
+                        pageNumbering: pageNumbering.value,
+                        fontSize: fontSize.value
+                    }
+                };
+                
+                // Save sections and questions
+                document.querySelectorAll('.section-item').forEach(section => {
+                    const sectionData = {
+                        name: section.querySelector('.section-header span').textContent,
+                        questions: []
+                    };
+                    
+                    section.querySelectorAll('.question-item').forEach(question => {
+                        const questionData = {
+                            type: question.querySelector('.question-type-select').value,
+                            text: question.querySelector('.question-text').value,
+                            marks: question.querySelector('.marks-input').value
+                        };
+                        
+                        if (questionData.type === 'mcq') {
+                            questionData.options = [];
+                            question.querySelectorAll('.mcq-option').forEach(option => {
+                                questionData.options.push(option.value);
+                            });
+                        }
+                        
+                        sectionData.questions.push(questionData);
+                    });
+                    
+                    data.sections.push(sectionData);
+                });
+                
+                const dataStr = JSON.stringify(data, null, 2);
+                const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                
+                const exportFileDefaultName = `${examNameInput.value.replace(/\s+/g, '_')}_${subjectNameInput.value.replace(/\s+/g, '_')}.json`;
+                
+                const linkElement = document.createElement('a');
+                linkElement.setAttribute('href', dataUri);
+                linkElement.setAttribute('download', exportFileDefaultName);
+                linkElement.click();
+                
+                showNotification('Question paper exported successfully!', 'success');
+            });
+            
+            // Import functionality
+            importBtn.addEventListener('click', function() {
+                importFile.click();
+            });
+            
+            importFile.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        try {
+                            const data = JSON.parse(event.target.result);
+                            
+                            // Load header data
+                            institutionNameInput.value = data.header.institutionName || '';
+                            institutionAddressInput.value = data.header.institutionAddress || '';
+                            examNameInput.value = data.header.examName || '';
+                            subjectNameInput.value = data.header.subjectName || '';
+                            subjectCodeInput.value = data.header.subjectCode || '';
+                            examDurationInput.value = data.header.examDuration || '';
+                            totalMarksInput.value = data.header.totalMarks || '';
+                            
+                            // Load settings
+                            selectedTemplate = data.template || 'board';
+                            watermarkText.value = data.settings.watermarkText || '';
+                            pageNumbering.value = data.settings.pageNumbering || 'none';
+                            fontSize.value = data.settings.fontSize || '12';
+                            
+                            // Update watermark preview
+                            watermarkPreview.textContent = watermarkText.value || 'SAMPLE';
+                            
+                            // Select template
+                            document.querySelectorAll('.template-card').forEach(card => {
+                                card.classList.remove('selected');
+                                if (card.getAttribute('data-template') === selectedTemplate) {
+                                    card.classList.add('selected');
+                                }
+                            });
+                            
+                            // Clear existing sections
+                            sectionsContainer.innerHTML = '';
+                            sectionCount = 0;
+                            questionCount = 0;
+                            
+                            // Load sections and questions
+                            data.sections.forEach(sectionData => {
+                                sectionCount++;
+                                const sectionId = `section-${sectionCount}`;
+                                const sectionLetter = String.fromCharCode(65 + sectionCount - 1);
+                                
+                                const sectionHtml = `
+                                    <div class="section-item" data-section-id="${sectionId}">
+                                        <div class="section-header d-flex justify-content-between align-items-center">
+                                            <span>${sectionData.name || `Section ${sectionLetter}`}</span>
+                                            <div>
+                                                <button type="button" class="btn btn-sm btn-outline-primary edit-section-btn">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-danger delete-section-btn" ${sectionCount === 1 ? 'style="display: none;"' : ''}>
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="section-questions" id="${sectionId}-questions">
+                                            <!-- Questions will be added here -->
+                                        </div>
+                                        
+                                        <div class="text-center mt-2">
+                                            <button type="button" class="btn btn-sm btn-outline-primary add-question-btn" data-section-id="${sectionId}">
+                                                <i class="fas fa-plus me-1"></i><span data-translate="addQuestion">Add Question</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                `;
+                                
+                                sectionsContainer.insertAdjacentHTML('beforeend', sectionHtml);
+                                
+                                // Add questions to section
+                                const questionsContainer = document.getElementById(`${sectionId}-questions`);
+                                sectionData.questions.forEach(questionData => {
+                                    questionCount++;
+                                    const questionId = `question-${questionCount}`;
+                                    
+                                    const questionHtml = `
+                                        <div class="question-item" data-question-id="${questionId}">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <div class="d-flex align-items-center">
+                                                    <span class="me-2 fw-bold">Q${questionCount}.</span>
+                                                    <select class="form-select form-select-sm question-type-select" style="width: auto;">
+                                                        <option value="written" ${questionData.type === 'written' ? 'selected' : ''}>Written</option>
+                                                        <option value="short" ${questionData.type === 'short' ? 'selected' : ''}>Short Answer</option>
+                                                        <option value="mcq" ${questionData.type === 'mcq' ? 'selected' : ''}>MCQ</option>
+                                                    </select>
+                                                </div>
+                                                <div class="d-flex align-items-center">
+                                                    <span class="me-2">Marks:</span>
+                                                    <input type="number" class="form-control form-control-sm marks-input" min="1" value="${questionData.marks || 1}">
+                                                    <button type="button" class="btn btn-sm btn-outline-danger ms-2 delete-question-btn">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <textarea class="form-control question-text" rows="2" placeholder="Enter question text">${questionData.text || ''}</textarea>
+                                            <div class="mcq-options mt-2" style="display: ${questionData.type === 'mcq' ? 'block' : 'none'};">
+                                                <div class="input-group mb-1">
+                                                    <span class="input-group-text">A.</span>
+                                                    <input type="text" class="form-control mcq-option" placeholder="Option A" value="${questionData.options && questionData.options[0] || ''}">
+                                                </div>
+                                                <div class="input-group mb-1">
+                                                    <span class="input-group-text">B.</span>
+                                                    <input type="text" class="form-control mcq-option" placeholder="Option B" value="${questionData.options && questionData.options[1] || ''}">
+                                                </div>
+                                                <div class="input-group mb-1">
+                                                    <span class="input-group-text">C.</span>
+                                                    <input type="text" class="form-control mcq-option" placeholder="Option C" value="${questionData.options && questionData.options[2] || ''}">
+                                                </div>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">D.</span>
+                                                    <input type="text" class="form-control mcq-option" placeholder="Option D" value="${questionData.options && questionData.options[3] || ''}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                                    
+                                    questionsContainer.insertAdjacentHTML('beforeend', questionHtml);
+                                    
+                                    // Add event listeners to the new question elements
+                                    const newQuestion = document.querySelector(`[data-question-id="${questionId}"]`);
+                                    
+                                    // Question type change
+                                    newQuestion.querySelector('.question-type-select').addEventListener('change', function() {
+                                        const mcqOptions = newQuestion.querySelector('.mcq-options');
+                                        if (this.value === 'mcq') {
+                                            mcqOptions.style.display = 'block';
+                                        } else {
+                                            mcqOptions.style.display = 'none';
+                                        }
+                                        updateQuestionsPreview();
+                                    });
+                                    
+                                    // Delete question button
+                                    newQuestion.querySelector('.delete-question-btn').addEventListener('click', function() {
+                                        if (confirm('Are you sure you want to delete this question?')) {
+                                            newQuestion.remove();
+                                            updateQuestionsPreview();
+                                            showNotification('Question deleted!', 'danger');
+                                        }
+                                    });
+                                    
+                                    // Update preview on input
+                                    newQuestion.querySelector('.question-text').addEventListener('input', updateQuestionsPreview);
+                                    newQuestion.querySelector('.marks-input').addEventListener('input', updateQuestionsPreview);
+                                    
+                                    // MCQ options input
+                                    newQuestion.querySelectorAll('.mcq-option').forEach(option => {
+                                        option.addEventListener('input', updateQuestionsPreview);
+                                    });
+                                });
+                            });
+                            
+                            // Add event listeners to section buttons
+                            attachSectionEventListeners();
+                            
+                            // Update preview
+                            updateHeaderPreview();
+                            updateQuestionsPreview();
+                            
+                            // Save to localStorage
+                            saveToLocalStorage();
+                            
+                            showNotification('Question paper imported successfully!', 'success');
+                        } catch (error) {
+                            console.error('Error importing data:', error);
+                            showNotification('Error importing question paper', 'danger');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            });
+            
+            // Share functionality
+            shareBtn.addEventListener('click', function() {
+                // Generate a unique share ID
+                shareId = 'share_' + Date.now();
+                const shareUrl = `${window.location.origin}${window.location.pathname}?share=${shareId}`;
+                
+                // Save current data to share storage
+                const data = {
+                    header: {
+                        institutionName: institutionNameInput.value,
+                        institutionAddress: institutionAddressInput.value,
+                        examName: examNameInput.value,
+                        subjectName: subjectNameInput.value,
+                        subjectCode: subjectCodeInput.value,
+                        examDuration: examNameInput.value,
+                        totalMarks: totalMarksInput.value
+                    },
+                    sections: [],
+                    template: selectedTemplate,
+                    settings: {
+                        watermarkText: watermarkText.value,
+                        pageNumbering: pageNumbering.value,
+                        fontSize: fontSize.value
+                    },
+                    comments: comments,
+                    versionHistory: versionHistory
+                };
+                
+                // Save sections and questions
+                document.querySelectorAll('.section-item').forEach(section => {
+                    const sectionData = {
+                        name: section.querySelector('.section-header span').textContent,
+                        questions: []
+                    };
+                    
+                    section.querySelectorAll('.question-item').forEach(question => {
+                        const questionData = {
+                            type: question.querySelector('.question-type-select').value,
+                            text: question.querySelector('.question-text').value,
+                            marks: question.querySelector('.marks-input').value
+                        };
+                        
+                        if (questionData.type === 'mcq') {
+                            questionData.options = [];
+                            question.querySelectorAll('.mcq-option').forEach(option => {
+                                questionData.options.push(option.value);
+                            });
+                        }
+                        
+                        sectionData.questions.push(questionData);
+                    });
+                    
+                    data.sections.push(sectionData);
+                });
+                
+                // Save to localStorage with share ID
+                localStorage.setItem(`share_${shareId}`, JSON.stringify(data));
+                
+                // Show share modal
+                shareLink.value = shareUrl;
+                shareModal.style.display = 'flex';
+                
+                // Load comments and version history
+                loadComments();
+                loadVersionHistory();
+            });
+            
+            // Close share modal
+            closeShareModalBtn.addEventListener('click', function() {
+                shareModal.style.display = 'none';
+            });
+            
+            // Copy share link
+            copyShareLinkBtn.addEventListener('click', function() {
+                shareLink.select();
+                document.execCommand('copy');
+                showNotification('Link copied to clipboard!', 'success');
+            });
+            
+            // Add comment
+            addCommentBtn.addEventListener('click', function() {
+                const commentText = commentInput.value.trim();
+                if (commentText) {
+                    const comment = {
+                        id: Date.now(),
+                        author: 'You', // In a real app, this would be the user's name
+                        text: commentText,
+                        time: new Date().toLocaleString()
+                    };
+                    
+                    comments.push(comment);
+                    commentInput.value = '';
+                    
+                    // Update share data
+                    updateShareData();
+                    
+                    // Reload comments
+                    loadComments();
+                    
+                    showNotification('Comment added!', 'success');
+                }
+            });
+            
+            // Load comments
+            function loadComments() {
+                commentsContainer.innerHTML = '';
+                
+                if (comments.length === 0) {
+                    commentsContainer.innerHTML = '<p class="text-muted">No comments yet.</p>';
+                    return;
+                }
+                
+                comments.forEach(comment => {
+                    const commentHtml = `
+                        <div class="comment-item">
+                            <div class="comment-author">${comment.author}</div>
+                            <div class="comment-text">${comment.text}</div>
+                            <div class="comment-time">${comment.time}</div>
+                        </div>
+                    `;
+                    commentsContainer.insertAdjacentHTML('beforeend', commentHtml);
+                });
+            }
+            
+            // Load version history
+            function loadVersionHistory() {
+                versionHistoryContainer.innerHTML = '';
+                
+                if (versionHistory.length === 0) {
+                    versionHistoryContainer.innerHTML = '<p class="text-muted">No version history yet.</p>';
+                    return;
+                }
+                
+                versionHistory.forEach((version, index) => {
+                    const versionHtml = `
+                        <div class="version-item">
+                            <div><strong>Version ${versionHistory.length - index}</strong></div>
+                            <div class="version-time">${version.time}</div>
+                        </div>
+                    `;
+                    versionHistoryContainer.insertAdjacentHTML('beforeend', versionHtml);
+                });
+            }
+            
+            // Update share data
+            function updateShareData() {
+                if (shareId) {
+                    const data = JSON.parse(localStorage.getItem(`share_${shareId}`));
+                    data.comments = comments;
+                    data.versionHistory = versionHistory;
+                    localStorage.setItem(`share_${shareId}`, JSON.stringify(data));
+                }
+            }
+            
+            // Print preview functionality
+            printPreviewBtn.addEventListener('click', function() {
+                // Generate print preview HTML
+                const printContent = generatePrintPreview();
+                printPreviewBody.innerHTML = printContent;
+                printPreviewContainer.style.display = 'flex';
+            });
+            
+            // Generate print preview HTML
+            function generatePrintPreview() {
+                const institutionName = institutionNameInput.value || 'Institution Name';
+                const institutionAddress = institutionAddressInput.value || 'Institution Address';
+                const examName = examNameInput.value || 'Exam Name';
+                const subjectName = subjectNameInput.value || 'Subject Name';
+                const subjectCode = subjectCodeInput.value || 'Subject Code';
+                const examDuration = examDurationInput.value || 'Exam Duration';
+                const totalMarks = totalMarksInput.value || 'Total Marks';
+                
+                let html = `
+                    <div style="font-family: 'Times New Roman', serif; max-width: 800px; margin: 0 auto; padding: 20px;">
+                        <div style="text-align: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid #dee2e6;">
+                `;
+                
+                if (logoDataUrl) {
+                    html += `<img src="${logoDataUrl}" alt="Institution Logo" style="max-width: 100px; max-height: 100px; margin-bottom: 15px;">`;
+                }
+                
+                html += `
+                            <h2 style="margin-bottom: 10px;">${institutionName}</h2>
+                            <p style="margin-bottom: 10px;">${institutionAddress}</p>
+                            <h3 style="margin-bottom: 10px;">${examName}</h3>
+                            <p><strong>Subject:</strong> ${subjectName} (${subjectCode}) | <strong>Duration:</strong> ${examDuration} | <strong>Total Marks:</strong> ${totalMarks}</p>
+                        </div>
+                `;
+                
+                // Add sections and questions
+                const sections = document.querySelectorAll('.section-item');
+                
+                sections.forEach(section => {
+                    const sectionName = section.querySelector('.section-header span').textContent;
+                    const questions = section.querySelectorAll('.question-item');
+                    
+                    if (questions.length > 0) {
+                        html += `
+                            <div style="margin-bottom: 25px;">
+                                <h4 style="margin-bottom: 15px; padding-bottom: 5px; border-bottom: 1px solid #dee2e6;">${sectionName}</h4>
+                        `;
+                        
+                        questions.forEach(question => {
+                            const questionNumber = question.getAttribute('data-question-id').split('-')[1];
+                            const questionType = question.querySelector('.question-type-select').value;
+                            const questionText = question.querySelector('.question-text').value;
+                            const marks = question.querySelector('.marks-input').value;
+                            
+                            html += `
+                                <div style="margin-bottom: 15px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                        <div style="flex: 1;"><strong>Q${questionNumber}.</strong> ${questionText || 'Question text'}</div>
+                                        <div style="margin-left: 10px;">[${marks} Mark${marks != 1 ? 's' : ''}]</div>
+                                    </div>
+                            `;
+                            
+                            if (questionType === 'mcq') {
+                                const options = question.querySelectorAll('.mcq-option');
+                                html += '<div style="margin-left: 20px; margin-top: 5px;">';
+                                options.forEach((option, index) => {
+                                    const optionLetter = String.fromCharCode(65 + index); // A, B, C, D
+                                    html += `<div>${optionLetter}. ${option.value || 'Option ' + optionLetter}</div>`;
+                                });
+                                html += '</div>';
+                            }
+                            
+                            html += '</div>';
+                        });
+                        
+                        html += '</div>';
+                    }
+                });
+                
+                html += '</div>';
+                
+                return html;
+            }
+            
+            // Close print preview
+            closePrintPreviewBtn.addEventListener('click', function() {
+                printPreviewContainer.style.display = 'none';
+            });
+            
+            closePrintPreviewFooterBtn.addEventListener('click', function() {
+                printPreviewContainer.style.display = 'none';
+            });
+            
+            // Print document
+            printDocumentBtn.addEventListener('click', function() {
+                window.print();
+            });
+            
+            // Update header preview
+            updateHeaderBtn.addEventListener('click', function() {
+                updateHeaderPreview();
+                saveToLocalStorage();
+                showNotification('Header updated successfully!', 'success');
+            });
+            
+            // Update header preview function
+            function updateHeaderPreview() {
+                previewInstitutionName.textContent = institutionNameInput.value || 'Institution Name';
+                previewInstitutionAddress.textContent = institutionAddressInput.value || 'Institution Address';
+                previewExamName.textContent = examNameInput.value || 'Exam Name';
+                previewSubjectName.textContent = subjectNameInput.value || 'Subject Name';
+                previewSubjectCode.textContent = subjectCodeInput.value || 'Subject Code';
+                previewExamDuration.textContent = examDurationInput.value || 'Exam Duration';
+                previewTotalMarks.textContent = totalMarksInput.value || 'Total Marks';
+                
+                if (logoDataUrl) {
+                    previewLogoContainer.innerHTML = `<img src="${logoDataUrl}" alt="Institution Logo" class="preview-logo">`;
+                } else {
+                    previewLogoContainer.innerHTML = '';
+                }
+            }
+            
+            // Handle logo upload
+            institutionLogoInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        logoDataUrl = event.target.result;
+                        logoPreview.innerHTML = `<img src="${logoDataUrl}" alt="Logo Preview" class="logo-preview">`;
+                        saveToLocalStorage();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // Add section
+            addSectionBtn.addEventListener('click', function() {
+                sectionCount++;
+                const sectionId = `section-${sectionCount}`;
+                const sectionLetter = String.fromCharCode(65 + sectionCount - 1); // A, B, C, etc.
+                
+                const sectionHtml = `
+                    <div class="section-item" data-section-id="${sectionId}">
+                        <div class="section-header d-flex justify-content-between align-items-center">
+                            <span><span data-translate="section">Section</span> ${sectionLetter}</span>
+                            <div>
+                                <button type="button" class="btn btn-sm btn-outline-primary edit-section-btn">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger delete-section-btn">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="section-questions" id="${sectionId}-questions">
+                            <!-- Questions will be added here -->
+                        </div>
+                        
+                        <div class="text-center mt-2">
+                            <button type="button" class="btn btn-sm btn-outline-primary add-question-btn" data-section-id="${sectionId}">
+                                <i class="fas fa-plus me-1"></i><span data-translate="addQuestion">Add Question</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                sectionsContainer.insertAdjacentHTML('beforeend', sectionHtml);
+                
+                // Show delete button for all sections except the first one
+                document.querySelectorAll('.delete-section-btn').forEach(btn => {
+                    btn.style.display = 'inline-block';
+                });
+                document.querySelector('[data-section-id="section-1"] .delete-section-btn').style.display = 'none';
+                
+                // Add event listeners to the new buttons
+                attachSectionEventListeners();
+                
+                saveToLocalStorage();
+                showNotification(`Section ${sectionLetter} added successfully!`, 'success');
+            });
+            
+            // Attach event listeners to section buttons
+            function attachSectionEventListeners() {
+                // Edit section button
+                document.querySelectorAll('.edit-section-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const sectionItem = this.closest('.section-item');
+                        const sectionHeader = sectionItem.querySelector('.section-header span');
+                        const currentName = sectionHeader.textContent;
+                        
+                        const newName = prompt('Enter section name:', currentName);
+                        if (newName && newName.trim() !== '') {
+                            sectionHeader.textContent = newName.trim();
+                            updateQuestionsPreview();
+                            saveToLocalStorage();
+                            showNotification('Section name updated!', 'success');
+                        }
+                    });
+                });
+                
+                // Delete section button
+                document.querySelectorAll('.delete-section-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        if (confirm('Are you sure you want to delete this section?')) {
+                            const sectionItem = this.closest('.section-item');
+                            sectionItem.remove();
+                            
+                            // Hide delete button for the first section if it's the only one left
+                            const remainingSections = document.querySelectorAll('.section-item');
+                            if (remainingSections.length === 1) {
+                                remainingSections[0].querySelector('.delete-section-btn').style.display = 'none';
+                            }
+                            
+                            updateQuestionsPreview();
+                            saveToLocalStorage();
+                            showNotification('Section deleted!', 'danger');
+                        }
+                    });
+                });
+                
+                // Add question button
+                document.querySelectorAll('.add-question-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const sectionId = this.getAttribute('data-section-id');
+                        addQuestion(sectionId);
+                    });
+                });
+            }
+            
+            // Add question
+            function addQuestion(sectionId) {
+                questionCount++;
+                const questionId = `question-${questionCount}`;
+                const questionsContainer = document.getElementById(`${sectionId}-questions`);
+                
+                const questionHtml = `
+                    <div class="question-item" data-question-id="${questionId}">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="d-flex align-items-center">
+                                <span class="me-2 fw-bold">Q${questionCount}.</span>
+                                <select class="form-select form-select-sm question-type-select" style="width: auto;">
+                                    <option value="written">Written</option>
+                                    <option value="short">Short Answer</option>
+                                    <option value="mcq">MCQ</option>
+                                </select>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="me-2">Marks:</span>
+                                <input type="number" class="form-control form-control-sm marks-input" min="1" value="1">
+                                <button type="button" class="btn btn-sm btn-outline-danger ms-2 delete-question-btn">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <textarea class="form-control question-text" rows="2" placeholder="Enter question text"></textarea>
+                        <div class="mcq-options mt-2" style="display: none;">
+                            <div class="input-group mb-1">
+                                <span class="input-group-text">A.</span>
+                                <input type="text" class="form-control mcq-option" placeholder="Option A">
+                            </div>
+                            <div class="input-group mb-1">
+                                <span class="input-group-text">B.</span>
+                                <input type="text" class="form-control mcq-option" placeholder="Option B">
+                            </div>
+                            <div class="input-group mb-1">
+                                <span class="input-group-text">C.</span>
+                                <input type="text" class="form-control mcq-option" placeholder="Option C">
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-text">D.</span>
+                                <input type="text" class="form-control mcq-option" placeholder="Option D">
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                questionsContainer.insertAdjacentHTML('beforeend', questionHtml);
+                
+                // Add event listeners to the new question elements
+                const newQuestion = document.querySelector(`[data-question-id="${questionId}"]`);
+                
+                // Question type change
+                newQuestion.querySelector('.question-type-select').addEventListener('change', function() {
+                    const mcqOptions = newQuestion.querySelector('.mcq-options');
+                    if (this.value === 'mcq') {
+                        mcqOptions.style.display = 'block';
+                    } else {
+                        mcqOptions.style.display = 'none';
+                    }
+                    updateQuestionsPreview();
+                    saveToLocalStorage();
+                });
+                
+                // Delete question button
+                newQuestion.querySelector('.delete-question-btn').addEventListener('click', function() {
+                    if (confirm('Are you sure you want to delete this question?')) {
+                        newQuestion.remove();
+                        updateQuestionsPreview();
+                        saveToLocalStorage();
+                        showNotification('Question deleted!', 'danger');
+                    }
+                });
+                
+                // Update preview on input
+                newQuestion.querySelector('.question-text').addEventListener('input', function() {
+                    updateQuestionsPreview();
+                    saveToLocalStorage();
+                });
+                
+                newQuestion.querySelector('.marks-input').addEventListener('input', function() {
+                    updateQuestionsPreview();
+                    saveToLocalStorage();
+                });
+                
+                // MCQ options input
+                newQuestion.querySelectorAll('.mcq-option').forEach(option => {
+                    option.addEventListener('input', function() {
+                        updateQuestionsPreview();
+                        saveToLocalStorage();
+                    });
+                });
+                
+                updateQuestionsPreview();
+                saveToLocalStorage();
+                showNotification('Question added successfully!', 'success');
+            }
+            
+            // Update questions preview
+            function updateQuestionsPreview() {
+                const sections = document.querySelectorAll('.section-item');
+                
+                if (sections.length === 0) {
+                    previewQuestionsContainer.innerHTML = '<p class="text-center text-muted">Add questions to see the preview</p>';
+                    return;
+                }
+                
+                let previewHtml = '';
+                
+                sections.forEach(section => {
+                    const sectionId = section.getAttribute('data-section-id');
+                    const sectionName = section.querySelector('.section-header span').textContent;
+                    const questions = section.querySelectorAll('.question-item');
+                    
+                    if (questions.length > 0) {
+                        previewHtml += `
+                            <div class="preview-section">
+                                <div class="preview-section-title">${sectionName}</div>
+                        `;
+                        
+                        questions.forEach(question => {
+                            const questionId = question.getAttribute('data-question-id');
+                            const questionNumber = questionId.split('-')[1];
+                            const questionType = question.querySelector('.question-type-select').value;
+                            const questionText = question.querySelector('.question-text').value;
+                            const marks = question.querySelector('.marks-input').value;
+                            
+                            let typeBadge = '';
+                            let typeClass = '';
+                            
+                            switch(questionType) {
+                                case 'written':
+                                    typeBadge = 'Written';
+                                    typeClass = 'bg-primary';
+                                    break;
+                                case 'short':
+                                    typeBadge = 'Short Answer';
+                                    typeClass = 'bg-info';
+                                    break;
+                                case 'mcq':
+                                    typeBadge = 'MCQ';
+                                    typeClass = 'bg-success';
+                                    break;
+                            }
+                            
+                            previewHtml += `
+                                <div class="preview-question">
+                                    <div class="d-flex justify-content-between">
+                                        <div><strong>Q${questionNumber}.</strong> ${questionText || 'Question text'}</div>
+                                        <div>
+                                            <span class="badge question-type-badge ${typeClass}">${typeBadge}</span>
+                                            <span class="badge bg-secondary">${marks} Mark${marks != 1 ? 's' : ''}</span>
+                                        </div>
+                                    </div>
+                            `;
+                            
+                            if (questionType === 'mcq') {
+                                const options = question.querySelectorAll('.mcq-option');
+                                previewHtml += '<div class="ms-4 mt-2">';
+                                options.forEach((option, index) => {
+                                    const optionLetter = String.fromCharCode(65 + index); // A, B, C, D
+                                    previewHtml += `<div>${optionLetter}. ${option.value || 'Option ' + optionLetter}</div>`;
+                                });
+                                previewHtml += '</div>';
+                            }
+                            
+                            previewHtml += '</div>';
+                        });
+                        
+                        previewHtml += '</div>';
+                    }
+                });
+                
+                if (previewHtml === '') {
+                    previewHtml = '<p class="text-center text-muted">Add questions to see the preview</p>';
+                }
+                
+                previewQuestionsContainer.innerHTML = previewHtml;
+            }
+            
+            // Refresh preview
+            refreshPreviewBtn.addEventListener('click', function() {
+                updateHeaderPreview();
+                updateQuestionsPreview();
+                showNotification('Preview refreshed!', 'info');
+            });
+            
+            // Generate PDF function
+            function generatePDF() {
+                return new Promise((resolve, reject) => {
+                    try {
+                        const { jsPDF } = window.jspdf;
+                        const doc = new jsPDF({
+                            orientation: 'portrait',
+                            unit: 'mm',
+                            format: 'a4'
+                        });
+                        
+                        // Get settings
+                        const watermark = watermarkText.value;
+                        const pageNumbers = pageNumbering.value;
+                        const fontSizeValue = parseInt(fontSize.value);
+                        
+                        // Set font size
+                        doc.setFontSize(fontSizeValue);
+                        
+                        // Add header
+                        const institutionName = institutionNameInput.value || 'Institution Name';
+                        const institutionAddress = institutionAddressInput.value || 'Institution Address';
+                        const examName = examNameInput.value || 'Exam Name';
+                        const subjectName = subjectNameInput.value || 'Subject Name';
+                        const subjectCode = subjectCodeInput.value || 'Subject Code';
+                        const examDuration = examDurationInput.value || 'Exam Duration';
+                        const totalMarks = totalMarksInput.value || 'Total Marks';
+                        
+                        // Add logo if available
+                        if (logoDataUrl) {
+                            doc.addImage(logoDataUrl, 'JPEG', 80, 10, 50, 50);
+                        }
+                        
+                        // Add institution name
+                        doc.setFontSize(fontSizeValue + 6);
+                        doc.setFont(undefined, 'bold');
+                        doc.text(institutionName, 105, 70, { align: 'center' });
+                        
+                        // Add institution address
+                        doc.setFontSize(fontSizeValue);
+                        doc.setFont(undefined, 'normal');
+                        doc.text(institutionAddress, 105, 78, { align: 'center' });
+                        
+                        // Add exam name
+                        doc.setFontSize(fontSizeValue + 4);
+                        doc.setFont(undefined, 'bold');
+                        doc.text(examName, 105, 90, { align: 'center' });
+                        
+                        // Add subject and duration
+                        doc.setFontSize(fontSizeValue);
+                        doc.setFont(undefined, 'normal');
+                        doc.text(`Subject: ${subjectName} (${subjectCode})`, 105, 100, { align: 'center' });
+                        doc.text(`Duration: ${examDuration} | Total Marks: ${totalMarks}`, 105, 108, { align: 'center' });
+                        
+                        // Add line separator
+                        doc.setLineWidth(0.5);
+                        doc.line(20, 115, 190, 115);
+                        
+                        // Add watermark if specified
+                        if (watermark) {
+                            doc.setFontSize(40);
+                            doc.setTextColor(200, 200, 200);
+                            doc.text(watermark, 105, 150, { 
+                                align: 'center', 
+                                angle: 45,
+                                renderingMode: 'stroke'
+                            });
+                            doc.setTextColor(0, 0, 0);
+                            doc.setFontSize(fontSizeValue);
+                        }
+                        
+                        // Add questions
+                        let yPosition = 125;
+                        let pageCount = 1;
+                        
+                        const sections = document.querySelectorAll('.section-item');
+                        
+                        sections.forEach(section => {
+                            const sectionName = section.querySelector('.section-header span').textContent;
+                            const questions = section.querySelectorAll('.question-item');
+                            
+                            if (questions.length > 0) {
+                                // Add section title
+                                doc.setFont(undefined, 'bold');
+                                doc.text(sectionName, 20, yPosition);
+                                yPosition += 10;
+                                
+                                questions.forEach(question => {
+                                    const questionNumber = question.getAttribute('data-question-id').split('-')[1];
+                                    const questionType = question.querySelector('.question-type-select').value;
+                                    const questionText = question.querySelector('.question-text').value;
+                                    const marks = question.querySelector('.marks-input').value;
+                                    
+                                    // Add question
+                                    doc.setFont(undefined, 'bold');
+                                    doc.text(`Q${questionNumber}.`, 20, yPosition);
+                                    
+                                    // Add question text
+                                    doc.setFont(undefined, 'normal');
+                                    const questionLines = doc.splitTextToSize(questionText || 'Question text', 160);
+                                    doc.text(questionLines, 30, yPosition);
+                                    yPosition += questionLines.length * 5 + 5;
+                                    
+                                    // Add MCQ options if applicable
+                                    if (questionType === 'mcq') {
+                                        const options = question.querySelectorAll('.mcq-option');
+                                        options.forEach((option, index) => {
+                                            const optionLetter = String.fromCharCode(65 + index); // A, B, C, D
+                                            doc.text(`${optionLetter}. ${option.value || 'Option ' + optionLetter}`, 30, yPosition);
+                                            yPosition += 5;
+                                        });
+                                    }
+                                    
+                                    // Add marks
+                                    doc.setFont(undefined, 'normal');
+                                    doc.text(`[${marks} Mark${marks != 1 ? 's' : ''}]`, 170, yPosition - 5);
+                                    
+                                    // Add space between questions
+                                    yPosition += 5;
+                                    
+                                    // Check if we need a new page
+                                    if (yPosition > 270) {
+                                        doc.addPage();
+                                        pageCount++;
+                                        yPosition = 20;
+                                        
+                                        // Add watermark to new page if specified
+                                        if (watermark) {
+                                            doc.setFontSize(40);
+                                            doc.setTextColor(200, 200, 200);
+                                            doc.text(watermark, 105, 150, { 
+                                                align: 'center', 
+                                                angle: 45,
+                                                renderingMode: 'stroke'
+                                            });
+                                            doc.setTextColor(0, 0, 0);
+                                            doc.setFontSize(fontSizeValue);
+                                        }
+                                    }
+                                });
+                                
+                                // Add space between sections
+                                yPosition += 5;
+                            }
+                        });
+                        
+                        // Add page numbers if specified
+                        if (pageNumbers !== 'none') {
+                            for (let i = 1; i <= pageCount; i++) {
+                                doc.setPage(i);
+                                doc.setFontSize(10);
+                                let pageText = `Page ${i} of ${pageCount}`;
+                                
+                                switch(pageNumbers) {
+                                    case 'bottom-right':
+                                        doc.text(pageText, 190, 285, { align: 'right' });
+                                        break;
+                                    case 'bottom-center':
+                                        doc.text(pageText, 105, 285, { align: 'center' });
+                                        break;
+                                    case 'top-right':
+                                        doc.text(pageText, 190, 10, { align: 'right' });
+                                        break;
+                                }
+                            }
+                        }
+                        
+                        // Return the PDF as a blob
+                        const pdfBlob = doc.output('blob');
+                        resolve(pdfBlob);
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
+            }
+            
+            // Preview PDF
+            previewPdfBtn.addEventListener('click', function() {
+                showLoadingSpinner(true);
+                
+                generatePDF().then(blob => {
+                    // Clean up previous URL if exists
+                    if (currentPdfUrl) {
+                        URL.revokeObjectURL(currentPdfUrl);
+                    }
+                    
+                    currentPdfBlob = blob;
+                    currentPdfUrl = URL.createObjectURL(blob);
+                    pdfPreviewFrame.setAttribute('data', currentPdfUrl);
+                    pdfPreviewContainer.style.display = 'flex';
+                    showLoadingSpinner(false);
+                }).catch(error => {
+                    console.error('Error generating PDF:', error);
+                    showLoadingSpinner(false);
+                    showNotification('Error generating PDF. Please try again.', 'danger');
+                });
+            });
+            
+            // Download PDF
+            generatePdfBtn.addEventListener('click', function() {
+                showLoadingSpinner(true);
+                
+                generatePDF().then(blob => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${examNameInput.value.replace(/\s+/g, '_')}_${subjectNameInput.value.replace(/\s+/g, '_')}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    
+                    // Clean up
+                    setTimeout(() => {
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        showLoadingSpinner(false);
+                        showNotification('PDF downloaded successfully!', 'success');
+                    }, 100);
+                }).catch(error => {
+                    console.error('Error generating PDF:', error);
+                    showLoadingSpinner(false);
+                    showNotification('Error generating PDF. Please try again.', 'danger');
+                });
+            });
+            
+            // Download PDF from preview
+            downloadPdfFromPreviewBtn.addEventListener('click', function() {
+                if (currentPdfBlob) {
+                    const url = URL.createObjectURL(currentPdfBlob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${examNameInput.value.replace(/\s+/g, '_')}_${subjectNameInput.value.replace(/\s+/g, '_')}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    
+                    // Clean up
+                    setTimeout(() => {
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        showNotification('PDF downloaded successfully!', 'success');
+                    }, 100);
+                }
+            });
+            
+            // Print PDF
+            printPdfBtn.addEventListener('click', function() {
+                if (currentPdfUrl) {
+                    const printWindow = window.open(currentPdfUrl, '_blank');
+                    if (printWindow) {
+                        printWindow.onload = function() {
+                            printWindow.print();
+                        };
+                    } else {
+                        showNotification('Popup blocked. Please allow popups and try again.', 'warning');
+                    }
+                }
+            });
+            
+            // Close PDF preview
+            function closePdfPreview() {
+                pdfPreviewContainer.style.display = 'none';
+                pdfPreviewFrame.removeAttribute('data');
+                
+                // Clean up resources
+                if (currentPdfUrl) {
+                    URL.revokeObjectURL(currentPdfUrl);
+                    currentPdfUrl = null;
+                }
+                currentPdfBlob = null;
+            }
+            
+            closePdfPreviewBtn.addEventListener('click', closePdfPreview);
+            closePdfPreviewFooterBtn.addEventListener('click', closePdfPreview);
+            
+            // Show loading spinner
+            function showLoadingSpinner(show) {
+                const spinner = document.getElementById('loadingSpinner');
+                if (show) {
+                    spinner.style.display = 'flex';
+                } else {
+                    spinner.style.display = 'none';
+                }
+            }
+            
+            // Show notification
+            function showNotification(message, type) {
+                const alertClass = {
+                    'success': 'alert-success',
+                    'danger': 'alert-danger',
+                    'info': 'alert-info',
+                    'warning': 'alert-warning'
+                }[type] || 'alert-info';
+                
+                const notification = document.createElement('div');
+                notification.className = `alert ${alertClass} alert-dismissible fade show position-fixed`;
+                notification.style.top = '20px';
+                notification.style.right = '20px';
+                notification.style.zIndex = '9999';
+                notification.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Auto remove after 3 seconds
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 300);
+                }, 3000);
+            }
+            
+            // Check for shared link
+            const urlParams = new URLSearchParams(window.location.search);
+            const shareParam = urlParams.get('share');
+            
+            if (shareParam) {
+                const sharedData = localStorage.getItem(`share_${shareParam}`);
+                if (sharedData) {
+                    try {
+                        const data = JSON.parse(sharedData);
+                        
+                        // Load header data
+                        institutionNameInput.value = data.header.institutionName || '';
+                        institutionAddressInput.value = data.header.institutionAddress || '';
+                        examNameInput.value = data.header.examName || '';
+                        subjectNameInput.value = data.header.subjectName || '';
+                        subjectCodeInput.value = data.header.subjectCode || '';
+                        examDurationInput.value = data.header.examDuration || '';
+                        totalMarksInput.value = data.header.totalMarks || '';
+                        
+                        // Load settings
+                        selectedTemplate = data.template || 'board';
+                        watermarkText.value = data.settings.watermarkText || '';
+                        pageNumbering.value = data.settings.pageNumbering || 'none';
+                        fontSize.value = data.settings.fontSize || '12';
+                        
+                        // Update watermark preview
+                        watermarkPreview.textContent = watermarkText.value || 'SAMPLE';
+                        
+                        // Select template
+                        document.querySelectorAll('.template-card').forEach(card => {
+                            card.classList.remove('selected');
+                            if (card.getAttribute('data-template') === selectedTemplate) {
+                                card.classList.add('selected');
+                            }
+                        });
+                        
+                        // Load comments and version history
+                        comments = data.comments || [];
+                        versionHistory = data.versionHistory || [];
+                        
+                        // Clear existing sections
+                        sectionsContainer.innerHTML = '';
+                        sectionCount = 0;
+                        questionCount = 0;
+                        
+                        // Load sections and questions
+                        data.sections.forEach(sectionData => {
+                            sectionCount++;
+                            const sectionId = `section-${sectionCount}`;
+                            const sectionLetter = String.fromCharCode(65 + sectionCount - 1);
+                            
+                            const sectionHtml = `
+                                <div class="section-item" data-section-id="${sectionId}">
+                                    <div class="section-header d-flex justify-content-between align-items-center">
+                                        <span>${sectionData.name || `Section ${sectionLetter}`}</span>
+                                        <div>
+                                            <button type="button" class="btn btn-sm btn-outline-primary edit-section-btn">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger delete-section-btn" ${sectionCount === 1 ? 'style="display: none;"' : ''}>
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="section-questions" id="${sectionId}-questions">
+                                        <!-- Questions will be added here -->
+                                    </div>
+                                    
+                                    <div class="text-center mt-2">
+                                        <button type="button" class="btn btn-sm btn-outline-primary add-question-btn" data-section-id="${sectionId}">
+                                            <i class="fas fa-plus me-1"></i><span data-translate="addQuestion">Add Question</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                            
+                            sectionsContainer.insertAdjacentHTML('beforeend', sectionHtml);
+                            
+                            // Add questions to section
+                            const questionsContainer = document.getElementById(`${sectionId}-questions`);
+                            sectionData.questions.forEach(questionData => {
+                                questionCount++;
+                                const questionId = `question-${questionCount}`;
+                                
+                                const questionHtml = `
+                                    <div class="question-item" data-question-id="${questionId}">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <div class="d-flex align-items-center">
+                                                <span class="me-2 fw-bold">Q${questionCount}.</span>
+                                                <select class="form-select form-select-sm question-type-select" style="width: auto;">
+                                                    <option value="written" ${questionData.type === 'written' ? 'selected' : ''}>Written</option>
+                                                    <option value="short" ${questionData.type === 'short' ? 'selected' : ''}>Short Answer</option>
+                                                    <option value="mcq" ${questionData.type === 'mcq' ? 'selected' : ''}>MCQ</option>
+                                                </select>
+                                            </div>
+                                            <div class="d-flex align-items-center">
+                                                <span class="me-2">Marks:</span>
+                                                <input type="number" class="form-control form-control-sm marks-input" min="1" value="${questionData.marks || 1}">
+                                                <button type="button" class="btn btn-sm btn-outline-danger ms-2 delete-question-btn">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <textarea class="form-control question-text" rows="2" placeholder="Enter question text">${questionData.text || ''}</textarea>
+                                        <div class="mcq-options mt-2" style="display: ${questionData.type === 'mcq' ? 'block' : 'none'};">
+                                            <div class="input-group mb-1">
+                                                <span class="input-group-text">A.</span>
+                                                <input type="text" class="form-control mcq-option" placeholder="Option A" value="${questionData.options && questionData.options[0] || ''}">
+                                            </div>
+                                            <div class="input-group mb-1">
+                                                <span class="input-group-text">B.</span>
+                                                <input type="text" class="form-control mcq-option" placeholder="Option B" value="${questionData.options && questionData.options[1] || ''}">
+                                            </div>
+                                            <div class="input-group mb-1">
+                                                <span class="input-group-text">C.</span>
+                                                <input type="text" class="form-control mcq-option" placeholder="Option C" value="${questionData.options && questionData.options[2] || ''}">
+                                            </div>
+                                            <div class="input-group">
+                                                <span class="input-group-text">D.</span>
+                                                <input type="text" class="form-control mcq-option" placeholder="Option D" value="${questionData.options && questionData.options[3] || ''}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                                
+                                questionsContainer.insertAdjacentHTML('beforeend', questionHtml);
+                                
+                                // Add event listeners to the new question elements
+                                const newQuestion = document.querySelector(`[data-question-id="${questionId}"]`);
+                                
+                                // Question type change
+                                newQuestion.querySelector('.question-type-select').addEventListener('change', function() {
+                                    const mcqOptions = newQuestion.querySelector('.mcq-options');
+                                    if (this.value === 'mcq') {
+                                        mcqOptions.style.display = 'block';
+                                    } else {
+                                        mcqOptions.style.display = 'none';
+                                    }
+                                    updateQuestionsPreview();
+                                });
+                                
+                                // Delete question button
+                                newQuestion.querySelector('.delete-question-btn').addEventListener('click', function() {
+                                    if (confirm('Are you sure you want to delete this question?')) {
+                                        newQuestion.remove();
+                                        updateQuestionsPreview();
+                                        showNotification('Question deleted!', 'danger');
+                                    }
+                                });
+                                
+                                // Update preview on input
+                                newQuestion.querySelector('.question-text').addEventListener('input', updateQuestionsPreview);
+                                newQuestion.querySelector('.marks-input').addEventListener('input', updateQuestionsPreview);
+                                
+                                // MCQ options input
+                                newQuestion.querySelectorAll('.mcq-option').forEach(option => {
+                                    option.addEventListener('input', updateQuestionsPreview);
+                                });
+                            });
+                        });
+                        
+                        // Add event listeners to section buttons
+                        attachSectionEventListeners();
+                        
+                        // Update preview
+                        updateHeaderPreview();
+                        updateQuestionsPreview();
+                        
+                        showNotification('Shared question paper loaded successfully!', 'success');
+                    } catch (error) {
+                        console.error('Error loading shared data:', error);
+                        showNotification('Error loading shared question paper', 'danger');
+                    }
+                }
+            }
+            
+            // Initialize event listeners
+            attachSectionEventListeners();
+            
+            // Add a default question to the first section
+            if (document.querySelectorAll('.question-item').length === 0) {
+                addQuestion('section-1');
+            }
+        });
+    </script>
+</body>
+</html>
